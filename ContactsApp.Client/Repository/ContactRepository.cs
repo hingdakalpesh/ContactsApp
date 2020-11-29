@@ -10,7 +10,7 @@ namespace ContactsApp.Client.Repositories
 {
     public class ContactRepository : IContactRepository
     {
-        private string url = "https://localhost:44318/api/contacts";
+        private string url = "https://contactsapi-ktech.azurewebsites.net/api/contacts";
         private readonly IHttpService httpService;
 
         public ContactRepository(IHttpService httpService)
