@@ -1,0 +1,132 @@
+﻿@page "/"
+@inject IContactRepository contactRepository
+
+<div class="p-3 mb-3">
+    <button class="btn btn-primary btn-block" @onclick="ShowCreateModal" >Add a new contact</button>
+</div>
+
+@if (Contacts is null)
+{
+    <h1 class="p-3">Loading contacts..</h1>
+}
+else
+{
+    <div class="card-columns mx-3">
+        @foreach (var contact in Contacts)
+        {
+            <ContactCard Model="contact" Delete="DeleteClickHandle" Edit="CreateEditClickHandle" View="ViewClickHandle"></ContactCard>
+        }
+
+        @if (showDelete)
+        {
+            <DeleteModal HideModal="HideDeleteModal" Model="currentContact" OnSubmit="OnDeleteSubmit"></DeleteModal>
+        }
+        @if (showCreate)
+        {
+            <CreateEditModal HideModal="HideCreateEditModal" Model="currentContact" OnValidSubmit="OnCreateEditSubmit" IsDisabled="readOnly"></CreateEditModal>
+        }
+    </div>
+}
+
+@code{
+    List<Contact> Contacts;
+    Contact currentContact = new Contact();
+    bool showDelete = false;
+    bool showCreate = false;
+    bool readOnly = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadContacts();
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+
+
+    protected void DeleteClickHandle(Contact contact)
+    {
+        currentContact = contact;
+        ShowDeleteModal();
+    }
+
+    protected async Task OnDeleteSubmit(Contact contact)
+    {
+        await contactRepository.DeleteContact(contact.Id);
+        HideDeleteModal();
+        await LoadContacts();
+    }
+
+    protected void CreateEditClickHandle(Contact contact)
+    {
+        readOnly = false;
+        if (contact.Id > 0)
+        {
+            currentContact = contact;
+        }
+        else
+        {
+            currentContact = new Contact();
+        }
+        ShowCreateEditModal();
+    }
+
+    protected async Task OnCreateEditSubmit(Contact contact)
+    {
+        currentContact = contact;
+
+        if (contact.Id > 0)
+        {
+            await contactRepository.UpdateContact(contact);
+        }
+        else
+        {
+            await contactRepository.CreateContact(contact);
+        }
+        HideCreateEditModal();
+        await LoadContacts();
+    }
+
+    protected void ViewClickHandle(Contact contact)
+    {
+        currentContact = contact;
+        readOnly = true;
+        ShowCreateEditModal();
+    }
+
+    async Task LoadContacts()
+    {
+        Contacts = await contactRepository.GetContacts();
+    }
+
+    void ShowDeleteModal()
+    {
+        showDelete = true;
+    }
+
+    void HideDeleteModal()
+    {
+        showDelete = false;
+    }
+
+    void ShowCreateEditModal()
+    {
+        showCreate = true;
+    }
+
+    void ShowCreateModal()
+    {
+        readOnly = false;
+        currentContact = new Contact();
+        ShowCreateEditModal();
+    }
+
+    void HideCreateEditModal()
+    {
+        showCreate = false;
+    }
+}

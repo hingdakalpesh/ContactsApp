@@ -1,0 +1,92 @@
+﻿<div class="card border-secondary mb-4">
+
+    <div class="card-img-top">
+        <InputImage Selectable="false" ImageBase64="@Model.Avtar"></InputImage>
+    </div>
+
+    <div class="card-header text-center bg-secondary">
+        <h5 class="card-title font-weight-bold text-white">@FullName</h5>
+    </div>
+
+    <div class="card-body text-secondary">
+        <table class="tab-content ">
+            <tbody class="align-text-top">
+                <tr class="ml-1">
+                    <td class="p-1"><span class="oi oi-phone"></span></td>
+                    <td class="p-1">
+                        <h6 class="card-subtitle">@Model.PhoneNumber</h6>
+                    </td>
+                </tr>
+                @if (!string.IsNullOrEmpty(@Model.Email))
+                {
+                    <tr class="ml-1">
+                        <td class="p-1"><span class="oi oi-envelope-closed"></span></td>
+                        <td class="p-1">
+                            <h6 class="card-subtitle">@Model.Email</h6>
+                        </td>
+                    </tr>
+                }
+                @if (!string.IsNullOrEmpty(@Model.Domain))
+                {
+                    <tr class="ml-1">
+                        <td class="p-1">
+                            <span class="oi oi-globe"></span>
+                        </td>
+                        <td class="p-1">
+                            <text>@Model.Domain</text>
+                        </td>
+                    </tr>
+                }
+                @if (!string.IsNullOrEmpty(@Model.Notes))
+                {
+                    <tr class="ml-1">
+                        <td class="p-1">
+                            <span class="oi oi-book"></span>
+                        </td>
+                        <td class="p-1">
+                            <p class="card-text">@Model.Notes</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer d-flex align-content-around">
+        <div class="col-4">
+            <button class="btn btn-block btn-outline-success" data-toggle="tooltip" data-placement="top" title="View full contact" @onclick="ViewClicked"><span class="oi oi-resize-both"></span></button>
+        </div>
+        <div class="col-4">
+            <button class="btn btn-block btn-outline-primary" data-toggle="modal" data-target=".edit-modal" data-placement="top" title="Edit contact" @onclick="EditClicked"><span class="oi oi-pencil"></span></button>
+        </div>
+        <div class="col-4">
+            <button class="btn btn-block btn-outline-danger" data-toggle="tooltip" data-placement="top" title="Delete contact" @onclick="DeleteClicked"><span class="oi oi-trash"></span></button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Contact Model { get; set; }
+    [Parameter] public EventCallback<Contact> Delete { get; set; }
+    [Parameter] public EventCallback<Contact> Edit { get; set; }
+    [Parameter] public EventCallback<Contact> View { get; set; }
+
+    public List<string> Color { get; set; } = new List<string>() { "primary", "secondary", "success", "danger", "warning", "info" };
+
+    string FullName { get => $"{Model.FirstName} {Model.LastName}"; }
+
+    protected async Task DeleteClicked(EventArgs e)
+    {
+        await Delete.InvokeAsync(Model);
+    }
+
+    protected async Task EditClicked(EventArgs e)
+    {
+        await Edit.InvokeAsync(Model);
+    }
+
+    protected async Task ViewClicked(EventArgs e)
+    {
+        await View.InvokeAsync(Model);
+    }
+}

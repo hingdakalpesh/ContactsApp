@@ -1,0 +1,135 @@
+﻿@inject IContactRepository contactRepository
+<!-- Modal -->
+<div class="modal edit-modal" tabindex="-1" role="dialog">
+    <EditForm Model="Model" OnValidSubmit="CreateEditContact">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="HideModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="col-12">
+                        <fieldset disabled="@IsDisabled">
+                            <DataAnnotationsValidator />
+
+                            @*Personal data*@
+                            <div class="form-group">
+                                <InputImage ImageBase64="@Model.Avtar" Selectable="!IsDisabled" OnSelectedImage="AvatarSelected" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>First name</label>
+                                <InputText class="form-control" @bind-Value="@Model.FirstName" />
+                                <ValidationMessage For="@(()=>Model.FirstName)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Last name</label>
+                                <InputText class="form-control" @bind-Value="@Model.LastName" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <InputText class="form-control" @bind-Value="@Model.Email" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone number</label>
+                                <InputText class="form-control" @bind-Value="@Model.PhoneNumber" />
+                                <ValidationMessage For="@(()=>Model.PhoneNumber)" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Domain</label>
+                                <InputText class="form-control" @bind-Value="@Model.Domain" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Notes</label>
+                                <InputTextArea class="form-control" @bind-Value="@Model.Notes" />
+                            </div>
+
+                            @*Company data*@
+                            @if (seeMore)
+                            {
+                                <br />
+                                <hr />
+                                <div class="form-group">
+                                    <label>Company</label>
+                                    <InputText class="form-control" @bind-Value="@Model.Company"></InputText>
+                                </div>
+
+                                <div class="form-group w-25">
+                                    <InputImage ImageBase64="@Model.Logo" Selectable="!IsDisabled" Label="Logo" OnSelectedImage="LogoSelected"></InputImage>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <InputTextArea class="form-control" @bind-Value="@Model.Description"></InputTextArea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Industry</label>
+                                    <InputText class="form-control" @bind-Value="@Model.Industry"></InputText>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tags</label>
+                                    <InputTextArea class="form-control" @bind-Value="@Model.Tags"></InputTextArea>
+                                </div>
+                            }
+                        </fieldset>
+                        <div class="text-right">
+                            <a class="badge badge-primary text-white" @onclick="SeeMoreToggle">@seeMoreText</a>
+                        </div>
+
+                    </div>
+                </div>
+
+                @if (!IsDisabled)
+                {
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" @onclick="HideModal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public Contact Model { get; set; }
+    [Parameter] public EventCallback HideModal { get; set; }
+    [Parameter] public EventCallback<Contact> OnValidSubmit { get; set; }
+    [Parameter] public bool IsDisabled { get; set; } = false;
+
+    bool seeMore = false;
+    string seeMoreText = "..see more";
+
+    private async Task CreateEditContact()
+    {
+        await OnValidSubmit.InvokeAsync(Model);
+    }
+
+    private void AvatarSelected(string imageBase64)
+    {
+        Model.Avtar = imageBase64;
+    }
+
+    private void LogoSelected(string imageBase64)
+    {
+        Model.Logo = imageBase64;
+    }
+
+    private void SeeMoreToggle()
+    {
+        seeMore = !seeMore;
+        seeMoreText = seeMore ? "..see less" : "..see more";
+    }
+}

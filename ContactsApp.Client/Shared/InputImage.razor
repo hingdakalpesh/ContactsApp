@@ -1,0 +1,43 @@
+﻿@using System.IO
+@inject IFileReaderService fileReaderService
+@using Tewr.Blazor.FileReader
+
+@if (Selectable)
+{
+<div class="mb-3">
+    <label>@Label</label>
+    <div>
+        <input type="file" @ref="inputElement" @onchange="ImageFileSelected" accept=".jpg,.jpeg,.png, .jfif" />
+    </div>
+</div>
+}
+@if (ImageBase64 != null)
+{
+    <div>
+        <img src="data:image/jpeg;base64, @ImageBase64" class="w-100" />
+    </div>
+}
+
+@code {
+    [Parameter] public string Label { get; set; } = "Avatar";
+    [Parameter] public string ImageBase64 { get; set; }
+    [Parameter] public EventCallback<string> OnSelectedImage { get; set; }
+    [Parameter] public bool Selectable { get; set; }
+
+    ElementReference inputElement;
+
+    async Task ImageFileSelected()
+    {
+        foreach (var file in await fileReaderService.CreateReference(inputElement).EnumerateFilesAsync())
+        {
+            using (MemoryStream memoryStream = await file.CreateMemoryStreamAsync(4 * 1024))
+            {
+                var imageBytes = new byte[memoryStream.Length];
+                memoryStream.Read(imageBytes, 0, (int)memoryStream.Length);
+                ImageBase64 = Convert.ToBase64String(imageBytes);
+                await OnSelectedImage.InvokeAsync(ImageBase64);
+                StateHasChanged();
+            }
+        }
+    }
+}
