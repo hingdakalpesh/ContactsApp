@@ -4,7 +4,7 @@
 ContactsAPI is a backend solution that provides CRUD operations to ContactsApp. It connects to Azure SQL Server database. The solution is built on .NET5 Web API and hosted on Azure App Service. 
 
 ## ContactsApp.Client:
-ContactsApp is a front-end solution built on .NET5 Blazor. It makes calls to ContactsAPI to read/write application data using Http client. The website is hosted on Azure App Service.
+ContactsApp is a front-end solution built on .NET5 Blazor that runs directly on client's browser via web assemblies. It makes calls to ContactsAPI to read/write application data using Http client. The website is hosted on Azure App Service.
 
 To access the website please follow the URL:
 http://contactsapp-ktech.azurewebsites.net/
